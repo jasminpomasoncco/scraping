@@ -15,40 +15,40 @@ def scrape_website(url):
         'Author': set()
     }
 
-    links = soup.find_all('a', href=True)
+    cards = soup.find_all('div', class_='card')
 
-    for link in links:
-        href = link['href']
-        link_text = link.get_text(strip=True)
-        
+    for card in cards:
+        link = card.find('a', href=True)
+        if link:
+            href = link['href']
+            link_text = link.get_text(strip=True)
 
-        if "/entry/" in href:
-            machine_date = ""
-            machine_name = ""
-            prev_element1 = link.find_parent('div', class_='card-date')
-            prev_element2 = link.find_parent('div', class_='card-title')
+            if "/entry/" in href:
+                machine_date = ""
+                machine_name = ""
+                date_element = card.find('div', class_='card-date')
+                name_element = card.find('div', class_='card-title')
 
-            if prev_element1:
-                machine_date = prev_element1.get_text(strip=True)
-            if prev_element2:
-                machine_name = prev_element2.get_text(strip=True)
+                if date_element:
+                    machine_date = date_element.get_text(strip=True)
+                if name_element:
+                    machine_name = name_element.get_text(strip=True)
 
-            
-            data_all.append({
-                'Machine Name': machine_name,
-                'Machine Date': machine_date,
-                'Author': "" 
-            })
-            unique_data['Machine Name'].add(machine_name)
-            unique_data['Machine Date'].add(machine_date)
+                data_all.append({
+                    'Machine Name': machine_name,
+                    'Machine Date': machine_date,
+                    'Author': "" 
+                })
+                unique_data['Machine Name'].add(machine_name)
+                unique_data['Machine Date'].add(machine_date)
 
-        elif "/author/" in href:
-            machine_author = link_text.strip()
+            elif "/author/" in href:
+                machine_author = link_text.strip()
 
-            if data_all:
-                data_all[-1]['Author'] = machine_author
+                if data_all:
+                    data_all[-1]['Author'] = machine_author
 
-            unique_data['Author'].add(machine_author)
+                unique_data['Author'].add(machine_author)
 
     return data_all, unique_data
 
